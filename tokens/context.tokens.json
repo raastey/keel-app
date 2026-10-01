@@ -1,0 +1,101 @@
+{
+  "$schema": "https://design-tokens.org/draft",
+  "meta": {
+    "product": "SIXTWELVE Context",
+    "version": "1.0.0",
+    "platforms": ["macos", "windows", "linux"],
+    "notes": "Neutral warm-paper base. Semantic status colors are never the only status signal — always pair with a label."
+  },
+  "color": {
+    "light": {
+      "canvas":        { "value": "#F7F6F4", "desc": "window background behind panes" },
+      "sidebar":       { "value": "#EFEDE9" },
+      "panel":         { "value": "#FFFFFF", "desc": "content surfaces, editor" },
+      "panel.sunken":  { "value": "#F2F0EC" },
+      "border":        { "value": "#E1DED8" },
+      "border.strong": { "value": "#CFCBC3" },
+      "text":          { "value": "#1C1B19" },
+      "text.muted":    { "value": "#6E6A63" },
+      "text.faint":    { "value": "#9A958C" },
+      "accent":        { "value": "#3B5D8C" },
+      "accent.soft":   { "value": "#E7EDF6" },
+      "selection":     { "value": "#D9E4F4" },
+      "status.ready":     { "value": "#3F7A54" },
+      "status.review":    { "value": "#B57A16" },
+      "status.error":     { "value": "#A8412F" },
+      "status.training":  { "value": "#5B5FA8" },
+      "status.neutral":   { "value": "#6E6A63" },
+      "diff.add":      { "value": "#E7F2E9" },
+      "diff.remove":   { "value": "#F8E9E6" }
+    },
+    "dark": {
+      "canvas":        { "value": "#141311" },
+      "sidebar":       { "value": "#1A1917" },
+      "panel":         { "value": "#1F1E1B" },
+      "panel.sunken":  { "value": "#181715" },
+      "border":        { "value": "#2E2C28" },
+      "border.strong": { "value": "#403D38" },
+      "text":          { "value": "#EFEDE8" },
+      "text.muted":    { "value": "#A19C93" },
+      "text.faint":    { "value": "#767168" },
+      "accent":        { "value": "#8FB0DE" },
+      "accent.soft":   { "value": "#1E2836" },
+      "selection":     { "value": "#26364B" },
+      "status.ready":     { "value": "#6FAE83" },
+      "status.review":    { "value": "#E0A94A" },
+      "status.error":     { "value": "#DE7C68" },
+      "status.training":  { "value": "#9296DC" },
+      "status.neutral":   { "value": "#A19C93" },
+      "diff.add":      { "value": "#1B2A1F" },
+      "diff.remove":   { "value": "#2E1E1B" }
+    }
+  },
+  "type": {
+    "family.ui":      { "value": "-apple-system, 'SF Pro Text', 'Segoe UI Variable', 'Inter var', system-ui, sans-serif" },
+    "family.reading": { "value": "'Spectral', 'Iowan Old Style', Georgia, serif", "desc": "Writer reading mode only" },
+    "family.mono":    { "value": "'SF Mono', 'JetBrains Mono', ui-monospace, monospace" },
+    "scale": {
+      "display": { "value": "34/40, -0.02em, 600" },
+      "title1":  { "value": "22/28, -0.01em, 600" },
+      "title2":  { "value": "17/24, -0.005em, 600" },
+      "body":    { "value": "13/20, 0, 400" },
+      "bodyLg":  { "value": "15/23, 0, 400" },
+      "label":   { "value": "12/16, 0.01em, 500" },
+      "caption": { "value": "11/15, 0.02em, 500" },
+      "meta":    { "value": "11/14, 0.06em, 600, uppercase" },
+      "reading": { "value": "17/29, 0, 400, family.reading" },
+      "code":    { "value": "12/19, 0, 400, family.mono" }
+    }
+  },
+  "space": { "1": "4", "2": "8", "3": "12", "4": "16", "5": "20", "6": "24", "7": "32", "8": "40", "9": "56", "unit": "px" },
+  "radius": { "xs": "3", "sm": "5", "md": "7", "lg": "10", "pill": "999", "unit": "px", "note": "Low radii — desktop chrome, not web cards." },
+  "elevation": {
+    "flat":    { "value": "none", "desc": "default; use separators not shadows" },
+    "popover": { "value": "0 1px 2px rgba(0,0,0,.10), 0 8px 24px rgba(0,0,0,.14)" },
+    "sheet":   { "value": "0 24px 64px rgba(0,0,0,.28)" }
+  },
+  "layout": {
+    "window.min":     { "value": "1120x720" },
+    "sidebar":        { "value": "236, min 180, max 320" },
+    "inspector":      { "value": "320, min 264, max 460" },
+    "header.height":  { "value": "44" },
+    "composer.min":   { "value": "88" },
+    "row.height":     { "value": "28 compact / 34 default" },
+    "reading.measure":{ "value": "68ch" }
+  },
+  "motion": {
+    "duration.instant": "80ms", "duration.fast": "140ms", "duration.state": "220ms", "duration.restore": "380ms",
+    "easing.standard": "cubic-bezier(.2,.6,.2,1)",
+    "rule": "Motion only for meaningful state change: pane change, context regeneration, training transition, project restore. Respect prefers-reduced-motion."
+  },
+  "status": {
+    "Ready":       { "color": "status.ready",    "glyph": "●" },
+    "Active":      { "color": "status.ready",    "glyph": "●" },
+    "Candidate":   { "color": "status.training", "glyph": "◐" },
+    "Training":    { "color": "status.training", "glyph": "◐" },
+    "Needs review":{ "color": "status.review",   "glyph": "▲" },
+    "Not ready":   { "color": "status.neutral",  "glyph": "○" },
+    "Interrupted": { "color": "status.review",   "glyph": "▮" },
+    "Error":       { "color": "status.error",    "glyph": "■" }
+  }
+}

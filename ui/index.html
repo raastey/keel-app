@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Keel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app" class="app" aria-live="polite">
+    <aside class="sidebar">
+      <div class="brand" data-tauri-drag-region><span class="brand-mark">K</span><span>Keel</span></div>
+      <nav id="nav" aria-label="Primary">
+        <button data-view="home" class="nav-item active"><span>⌂</span>Home</button>
+        <button data-view="writer" class="nav-item"><span>¶</span>Writer</button>
+        <button data-view="developer" class="nav-item"><span>⌘</span>Developer</button>
+        <button data-view="library" class="nav-item"><span>▤</span>Library</button>
+        <button data-view="learning" class="nav-item"><span>◐</span>Learning</button>
+        <button data-view="models" class="nav-item"><span>▣</span>Models</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <button data-view="settings" class="nav-item"><span>⚙</span>Settings</button>
+        <div id="engine-pill" class="engine-pill"><i></i><span>No Engine</span></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="toolbar" data-tauri-drag-region>
+        <div id="breadcrumbs">Home</div>
+        <div class="toolbar-actions">
+          <button id="context-button" class="quiet" title="Working Context (⌘I)">Context</button>
+          <button id="palette-button" class="quiet" title="Command Palette (⌘K)">⌘ K</button>
+        </div>
+      </header>
+      <section id="content" class="content"></section>
+    </main>
+  </div>
+  <div id="overlay" class="overlay hidden"></div>
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
+

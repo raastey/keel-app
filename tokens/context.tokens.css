@@ -1,0 +1,33 @@
+/* SIXTWELVE Context — design tokens (CSS custom properties)
+   Generated from tokens/context.tokens.json. Light is default; [data-theme="dark"] overrides. */
+:root{
+  --ctx-canvas:#F7F6F4; --ctx-sidebar:#EFEDE9; --ctx-panel:#FFFFFF; --ctx-panel-sunken:#F2F0EC;
+  --ctx-border:#E1DED8; --ctx-border-strong:#CFCBC3;
+  --ctx-text:#1C1B19; --ctx-text-muted:#6E6A63; --ctx-text-faint:#9A958C;
+  --ctx-accent:#3B5D8C; --ctx-accent-soft:#E7EDF6; --ctx-selection:#D9E4F4;
+  --ctx-ready:#3F7A54; --ctx-review:#B57A16; --ctx-error:#A8412F; --ctx-training:#5B5FA8; --ctx-neutral:#6E6A63;
+  --ctx-diff-add:#E7F2E9; --ctx-diff-remove:#F8E9E6;
+
+  --ctx-font-ui:-apple-system,"SF Pro Text","Segoe UI Variable","Inter var",system-ui,sans-serif;
+  --ctx-font-reading:"Spectral","Iowan Old Style",Georgia,serif;
+  --ctx-font-mono:"SF Mono","JetBrains Mono",ui-monospace,monospace;
+
+  --ctx-space-1:4px; --ctx-space-2:8px; --ctx-space-3:12px; --ctx-space-4:16px;
+  --ctx-space-5:20px; --ctx-space-6:24px; --ctx-space-7:32px; --ctx-space-8:40px; --ctx-space-9:56px;
+  --ctx-radius-xs:3px; --ctx-radius-sm:5px; --ctx-radius-md:7px; --ctx-radius-lg:10px; --ctx-radius-pill:999px;
+
+  --ctx-shadow-popover:0 1px 2px rgba(0,0,0,.10),0 8px 24px rgba(0,0,0,.14);
+  --ctx-shadow-sheet:0 24px 64px rgba(0,0,0,.28);
+
+  --ctx-sidebar-w:236px; --ctx-inspector-w:320px; --ctx-header-h:44px; --ctx-measure:68ch;
+  --ctx-dur-fast:140ms; --ctx-dur-state:220ms; --ctx-dur-restore:380ms; --ctx-ease:cubic-bezier(.2,.6,.2,1);
+}
+[data-theme="dark"]{
+  --ctx-canvas:#141311; --ctx-sidebar:#1A1917; --ctx-panel:#1F1E1B; --ctx-panel-sunken:#181715;
+  --ctx-border:#2E2C28; --ctx-border-strong:#403D38;
+  --ctx-text:#EFEDE8; --ctx-text-muted:#A19C93; --ctx-text-faint:#767168;
+  --ctx-accent:#8FB0DE; --ctx-accent-soft:#1E2836; --ctx-selection:#26364B;
+  --ctx-ready:#6FAE83; --ctx-review:#E0A94A; --ctx-error:#DE7C68; --ctx-training:#9296DC; --ctx-neutral:#A19C93;
+  --ctx-diff-add:#1B2A1F; --ctx-diff-remove:#2E1E1B;
+}
+@media (prefers-reduced-motion:reduce){ :root{ --ctx-dur-fast:0ms; --ctx-dur-state:0ms; --ctx-dur-restore:0ms; } }
