@@ -203,6 +203,17 @@ pub struct GenerationResult {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ComparisonRun {
+    pub variant: String,
+    pub label: String,
+    pub text: String,
+    pub words: usize,
+    pub seconds: f32,
+    pub sources: usize,
+    pub receipt: Receipt,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct AppData {
     pub schema_version: u32,

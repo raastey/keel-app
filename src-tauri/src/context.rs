@@ -129,6 +129,24 @@ pub fn assemble(
     }
 }
 
+/// Same request, three levels of steering: nothing, the project's rules, the full Working Context.
+pub fn comparison_variants(
+    context: &WorkingContext,
+) -> Vec<(&'static str, &'static str, WorkingContext)> {
+    let mut bare = context.clone();
+    bare.objective.clear();
+    bare.constraints.clear();
+    bare.decisions.clear();
+    bare.included.clear();
+    let mut rules = context.clone();
+    rules.included.clear();
+    vec![
+        ("bare", "No context", bare),
+        ("rules", "Project rules only", rules),
+        ("full", "Full Working Context", context.clone()),
+    ]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -163,5 +181,42 @@ mod tests {
         let result = assemble(&project, &[source], "water", 1000);
         assert!(result.included.is_empty());
         assert_eq!(result.not_included[0].reason, "quarantined");
+    }
+
+    #[test]
+    fn comparison_variants_strip_steering_in_order() {
+        let source_id = Uuid::new_v4();
+        let context = WorkingContext {
+            id: Uuid::new_v4(),
+            project_id: Uuid::new_v4(),
+            objective: "Explain the budget".into(),
+            constraints: vec!["No jargon".into()],
+            decisions: vec!["Use 2026 figures".into()],
+            included: vec![ContextItem {
+                source_id,
+                name: "budget.md".into(),
+                excerpt: "Spending rose".into(),
+                reason: "matches budget".into(),
+                score: 1.0,
+                tokens: 4,
+                canonical: true,
+            }],
+            not_included: vec![],
+            open_threads: vec![],
+            used_tokens: 4,
+            max_tokens: 1000,
+            created_at: Utc::now(),
+        };
+        let variants = comparison_variants(&context);
+        let ids: Vec<_> = variants.iter().map(|(id, _, _)| *id).collect();
+        assert_eq!(ids, ["bare", "rules", "full"]);
+        let (_, _, bare) = &variants[0];
+        assert!(
+            bare.objective.is_empty() && bare.constraints.is_empty() && bare.included.is_empty()
+        );
+        let (_, _, rules) = &variants[1];
+        assert_eq!(rules.constraints, context.constraints);
+        assert!(rules.included.is_empty());
+        assert_eq!(variants[2].2.included.len(), 1);
     }
 }

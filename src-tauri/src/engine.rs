@@ -186,6 +186,42 @@ pub async fn check(engine: &Engine) -> Result<String> {
     }
 }
 
+#[derive(Deserialize)]
+struct OllamaTags {
+    models: Vec<OllamaTag>,
+}
+
+#[derive(Deserialize)]
+struct OllamaTag {
+    name: String,
+    remote_host: Option<String>,
+}
+
+/// Local Ollama models only; cloud-hosted tags would send text off the machine.
+pub async fn detect_ollama(endpoint: &str) -> Result<Vec<String>> {
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(4))
+        .build()
+        .map_err(|e| KeelError::Engine(e.to_string()))?;
+    let tags = client
+        .get(format!("{}/api/tags", endpoint.trim_end_matches('/')))
+        .send()
+        .await
+        .map_err(|_| KeelError::Engine("Ollama is not running on this Mac".into()))?
+        .json::<OllamaTags>()
+        .await
+        .map_err(|e| KeelError::Engine(e.to_string()))?;
+    Ok(local_models(tags))
+}
+
+fn local_models(tags: OllamaTags) -> Vec<String> {
+    tags.models
+        .into_iter()
+        .filter(|tag| tag.remote_host.is_none() && !tag.name.contains("cloud"))
+        .map(|tag| tag.name)
+        .collect()
+}
+
 async fn generate_sixtwelve(
     engine: &Engine,
     context: &WorkingContext,
@@ -251,5 +287,19 @@ async fn generate_sixtwelve(
         Err(KeelError::Engine("Local model returned no answer".into()))
     } else {
         Ok(text)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn detection_excludes_cloud_models() {
+        let tags: OllamaTags = serde_json::from_str(
+            r#"{"models":[{"name":"llama3.2:3b"},{"name":"gpt-oss:120b-cloud"},{"name":"kimi","remote_host":"https://ollama.com"}]}"#,
+        )
+        .unwrap();
+        assert_eq!(local_models(tags), ["llama3.2:3b"]);
     }
 }

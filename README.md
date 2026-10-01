@@ -1,8 +1,31 @@
 # Keel
 
-**Keel** (by SIXTWELVE) — *AI that remembers how you work.*  A Rust/Tauri local-first AI desktop product. macOS first; Linux follows through the same Rust core.
+**Keel** (by SIXTWELVE): *AI that remembers how you work.* A local-first macOS desktop app that shows you exactly what an AI model receives before it answers, and lets you measure how that context changes the answer.
 
-## Run and verify
+## Why Keel exists
+
+Most AI tools hide the context they send to a model. Keel makes it the product:
+
+- **Context Inspector.** Before any answer, you see the Working Context: objective, constraints, decisions, the sources included, the sources left out, and why.
+- **Context Lab.** Choose **Compare** to send the same request three times: with no context, with only your project rules, and with the full Working Context. The answers appear side by side with word counts, timing, and a receipt for each.
+- **Receipts.** Every answer records the Engine, the sources used, and whether anything left the Mac.
+- **Gates.** Remote providers need an itemised send gate. Code changes need six gates. A trained Personal Model needs quality checks and a blind comparison before it can be activated.
+
+The research behind Keel, including a measured study of prompt engineering, retrieval, and LoRA fine-tuning on the same 3B model, is in [raastey/model-training](https://github.com/raastey/model-training).
+
+## Install (Apple silicon, macOS 13+)
+
+1. Download `Keel_0.1.0_aarch64.dmg` from [Releases](https://github.com/raastey/keel-app/releases) and drag Keel to Applications.
+2. Install [Ollama](https://ollama.com), then in Terminal run:
+   ```sh
+   ollama pull qwen2.5:3b
+   ```
+3. Open Keel and choose **Connect Ollama** on the welcome screen. Keel uses only models that run on your Mac; cloud models are ignored.
+4. Create a **Writer** project, write or import material into the Library, enter a request, choose **Prepare context**, then **Send** or **Compare**.
+
+A remote OpenAI-compatible provider is optional (**Models**). Its key is stored in macOS Keychain, and every remote request passes the send gate.
+
+## Build from source
 
 Requirements: Rust 1.85+, Cargo, Node 20+ (development tooling only), and the Tauri 2 CLI.
 
@@ -12,16 +35,11 @@ npm run check
 cargo tauri build --bundles app,dmg
 ```
 
-Release outputs are written to `src-tauri/target/release/bundle/`. Keel does not copy model weights into the app. On the owner's Mac it automatically discovers `../model-training` (or `KEEL_MODEL_TRAINING_ROOT`) and adds two local engines: Writer with retrieval and Code 7B. Writer and Developer projects route to the correct model automatically. Ollama and OpenAI-compatible engines remain optional; remote keys are stored in macOS Keychain.
+Release outputs are written to `src-tauri/target/release/bundle/`. Keel does not copy model weights into the app.
 
-### Use the local models
+### Owner build: SIXTWELVE local models
 
-1. Open Keel and finish the short welcome screen.
-2. Create a **Writer** project for writing chat, or a **Developer** project for code chat.
-3. In Writer, enter a request, choose **Prepare context**, review it, then choose **Send**. Developer model answers are read-only until a reviewed patch passes Keel's write gates.
-4. Open **Models** to check both local engines. `SIXTWELVE Writer` and `SIXTWELVE Code 7B` should each report ready.
-
-The first answer can take longer because the local model is loaded into memory. No prompt, source, or model output leaves the Mac when either SIXTWELVE engine is used.
+On the owner's Mac, Keel discovers the sibling `../model-training` lab (or `KEEL_MODEL_TRAINING_ROOT`) and adds two MLX engines: Writer (Qwen2.5 3B with retrieval) and Code 7B (Qwen2.5-Coder 7B). Writer and Developer projects route to the correct model automatically. No prompt, source, or output leaves the Mac when either engine is used.
 
 ## Architecture
 

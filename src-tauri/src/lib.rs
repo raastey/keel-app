@@ -111,43 +111,78 @@ async fn check_engine(state: State<'_, AppState>, engine_id: Uuid) -> Result<Str
 }
 
 #[tauri::command]
+async fn detect_ollama() -> Result<Vec<String>> {
+    engine::detect_ollama("http://127.0.0.1:11434").await
+}
+
+#[tauri::command]
 async fn generate(state: State<'_, AppState>, input: GenerateInput) -> Result<GenerationResult> {
-    let selected = {
-        let service = locked(&state)?;
-        service.validate_context(input.project_id, &input.context)?;
-        let engine = service
-            .engine_for_project(input.project_id)
-            .cloned()
-            .ok_or_else(|| {
-                KeelError::Policy("Choose an Engine before asking Keel to answer".into())
-            })?;
-        if engine.remote && !input.remote_confirmed {
-            return Err(KeelError::Policy(
-                "Review the itemised send gate before using a remote provider".into(),
-            ));
-        }
-        engine
-    };
+    let selected = gated_engine(&locked(&state)?, &input)?;
     let text = engine::generate(&selected, &input.context, &input.prompt).await?;
-    let receipt = Receipt {
+    let receipt = receipt_for(input.project_id, &selected, &input.context);
+    locked(&state)?.record_receipt(receipt.clone())?;
+    Ok(GenerationResult { text, receipt })
+}
+
+fn gated_engine(
+    service: &std::sync::MutexGuard<'_, Service>,
+    input: &GenerateInput,
+) -> Result<Engine> {
+    service.validate_context(input.project_id, &input.context)?;
+    let engine = service
+        .engine_for_project(input.project_id)
+        .cloned()
+        .ok_or_else(|| KeelError::Policy("Choose an Engine before asking Keel to answer".into()))?;
+    if engine.remote && !input.remote_confirmed {
+        return Err(KeelError::Policy(
+            "Review the itemised send gate before using a remote provider".into(),
+        ));
+    }
+    Ok(engine)
+}
+
+fn receipt_for(project_id: Uuid, engine: &Engine, context: &WorkingContext) -> Receipt {
+    Receipt {
         id: Uuid::new_v4(),
-        project_id: input.project_id,
-        engine: selected.name.clone(),
-        engine_id: selected.id,
+        project_id,
+        engine: engine.name.clone(),
+        engine_id: engine.id,
         personal_model: None,
-        context_id: input.context.id,
-        source_names: input
-            .context
+        context_id: context.id,
+        source_names: context
             .included
             .iter()
             .map(|item| item.name.clone())
             .collect(),
-        remote: selected.remote,
-        provider: selected.remote.then_some(selected.name),
+        remote: engine.remote,
+        provider: engine.remote.then(|| engine.name.clone()),
         created_at: Utc::now(),
-    };
-    locked(&state)?.record_receipt(receipt.clone())?;
-    Ok(GenerationResult { text, receipt })
+    }
+}
+
+#[tauri::command]
+async fn compare_context(
+    state: State<'_, AppState>,
+    input: GenerateInput,
+) -> Result<Vec<ComparisonRun>> {
+    let selected = gated_engine(&locked(&state)?, &input)?;
+    let mut runs = Vec::new();
+    for (variant, label, context) in context::comparison_variants(&input.context) {
+        let started = std::time::Instant::now();
+        let text = engine::generate(&selected, &context, &input.prompt).await?;
+        let receipt = receipt_for(input.project_id, &selected, &context);
+        locked(&state)?.record_receipt(receipt.clone())?;
+        runs.push(ComparisonRun {
+            variant: variant.into(),
+            label: label.into(),
+            words: text.split_whitespace().count(),
+            seconds: started.elapsed().as_secs_f32(),
+            sources: context.included.len(),
+            text,
+            receipt,
+        });
+    }
+    Ok(runs)
 }
 
 #[tauri::command]
@@ -268,7 +303,9 @@ pub fn run() {
             add_engine,
             set_active_engine,
             check_engine,
+            detect_ollama,
             generate,
+            compare_context,
             set_theme,
             create_proposal,
             apply_proposal,
